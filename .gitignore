@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ===========================================================================
+# Project-specific (BoK-Comp eval)
+# ===========================================================================
+
+# Local secrets — must NOT be committed
+.env
+.env.local
+
+# Experiment raw outputs — do not version-control. Only summary tables /
+# plots in analysis/ are checked in.
+predictions/
+results/
+runs/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store

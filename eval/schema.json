@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bok-comp-qa/schema.json",
+  "title": "BoK-Comp-QA item",
+  "description": "Annotation schema for the Bank of Korea Compensation Regulations QA evaluation set.",
+  "type": "object",
+  "required": [
+    "qid",
+    "category",
+    "difficulty",
+    "question",
+    "gold_answer",
+    "gold_answer_normalized",
+    "evidence",
+    "expected_backend"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "qid": {
+      "type": "string",
+      "pattern": "^C(10|[1-9])-[0-9]{3}$",
+      "description": "Stable ID. Format: C{category}-{nnn}, e.g. C3-007."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "single_lookup",
+        "join_2key",
+        "multihop_3key",
+        "calculation",
+        "article_text",
+        "negation_exception",
+        "aggregation",
+        "comparison",
+        "term_normalization",
+        "out_of_scope"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard"]
+    },
+    "question": {
+      "type": "string",
+      "minLength": 3,
+      "description": "The natural-language question in Korean."
+    },
+    "gold_answer": {
+      "type": "string",
+      "description": "Human-readable canonical answer."
+    },
+    "gold_answer_normalized": {
+      "description": "Machine-comparable form. Use whichever shape fits the question type.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "money"},
+            "value": {"type": "number"},
+            "currency": {"type": "string", "enum": ["KRW", "USD", "EUR", "JPY", "GBP", "HKD", "CNY"]},
+            "period": {"type": "string", "enum": ["monthly", "annual", "hourly", "lumpsum"]}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "number"},
+            "value": {"type": "number"},
+            "unit": {"type": "string"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "ratio"},
+            "value": {"type": "number"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "boolean"},
+            "value": {"type": "boolean"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "set"},
+            "value": {"type": "array", "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type", "value"],
+          "properties": {
+            "type": {"const": "string"},
+            "value": {"type": "string"},
+            "aliases": {"type": "array", "items": {"type": "string"}}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {"const": "refusal"}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "e.g. '제2조', '별표7', '별표1-5 국외본봉표', 'regulation_context.md#연봉제 계산 데이터'"
+          },
+          "row": {
+            "type": "object",
+            "description": "Optional key/value identifying the specific row in a table."
+          },
+          "quote": {
+            "type": "string",
+            "description": "Optional verbatim quote from the regulation."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "required_keys": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Keys the system must join on. Length serves as a proxy for join arity."
+    },
+    "expected_backend": {
+      "type": "string",
+      "enum": ["typedb", "neo4j", "context", "hybrid", "any"],
+      "description": "Hypothesized best backend for this item; analysis pivot only — does not constrain the model."
+    },
+    "requires_calculation": {"type": "boolean", "default": false},
+    "requires_text_reasoning": {"type": "boolean", "default": false},
+    "paraphrases": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Surface-form variants of the same question; used for robustness measurement."
+    },
+    "negative_distractors": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Plausible-but-wrong answers a confused system might emit."
+    },
+    "notes": {"type": "string"}
+  }
+}
