@@ -1,0 +1,20 @@
+% Table: Surface-form size comparison (token efficiency frontier).
+\begin{table}[t]
+\centering
+\caption{Surface-form size and mean accuracy across four LLM families.
+C-NL Pareto-dominates the other in-context tiers: highest mean accuracy
+at less than half the token cost.}
+\label{tab:token-cost}
+\small
+\begin{tabular}{l r r}
+\toprule
+Surface form & Size (chars) & Mean accuracy \\
+\midrule
+C-MD (production retrieval, chunked) & $\sim$13K & 78.5\% \\
+C-TQL (TypeQL insert dump)            & 32{,}436 & 83.3\% \\
+C-Cypher (Cypher CREATE dump)         & 32{,}030 & 82.8\% \\
+\textbf{C-NL (natural-language summary)} & \textbf{14{,}000} & \textbf{89.8\%} \\
+C-JSONLD (nested JSON-LD)             & 26{,}278 & 85.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}

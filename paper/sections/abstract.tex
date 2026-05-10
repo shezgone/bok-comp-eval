@@ -1,0 +1,27 @@
+\begin{abstract}
+We evaluate a production-deployed retrieval-augmented question-answering
+system over the Bank of Korea Compensation Regulations on a 100-question
+benchmark spanning ten categories and four large language model
+families. The system fields four backends — a hyper-relational
+knowledge graph (TypeDB v3), a property graph (Neo4j), a preprocessed
+context retriever, and a closed-book baseline — alongside four
+in-context surface forms in which the entire knowledge graph is dumped
+into the prompt as TypeQL, Cypher, JSON-LD, or natural language.
+Counterintuitively, the production knowledge-graph agents underperform
+the in-context surface forms by 21--30 percentage points on multi-key
+queries (paired McNemar $p<0.05$ in 5 of 8 comparisons), despite the
+agents having strictly more data. Disentangling \emph{query generation}
+from \emph{KG expressivity}, we find that natural-language summary of
+the same KG facts is Pareto-optimal in the (accuracy, token cost)
+frontier (88.75\% mean accuracy, 14K vs 32K characters), and that one
+LLM family (Llama-4-Scout) exhibits a 21-percentage-point form
+sensitivity that other families do not — directly tracing the bottleneck
+to query-language familiarity rather than KG expressivity. We further
+show that in-context KG dumps are paradoxically weaker than natural
+language at \emph{closed-world boundary inference} (proving absence),
+because the schema-driven structural clarity of the KG is stripped when
+serialized as a raw dump. We argue that KG infrastructure should be
+valued as the \emph{operational backbone} of the system rather than as
+the LLM-facing surface form, and propose explicit boundary annotations
+in KG-to-natural-language conversion pipelines as a practical remedy.
+\end{abstract}

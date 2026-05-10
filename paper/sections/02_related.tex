@@ -1,0 +1,68 @@
+\section{Related Work}\label{sec:related}
+
+\paragraph{KG-augmented retrieval.}
+GraphRAG~\citep{edge2024graphrag} introduced a community-detection
+approach in which a KG is constructed and then summarized at
+multiple levels of abstraction; query-time retrieval selects
+community summaries rather than raw triples.
+HippoRAG~\citep{gutierrez2024hipporag} treats retrieval as
+personalized PageRank over a KG built from a corpus, mimicking
+hippocampal indexing for multi-hop QA. Both approaches construct
+the KG \emph{from} the corpus; we instead start from a
+production-curated KG and ask how its \emph{surface form} affects
+LLM downstream accuracy. The two strands of work are complementary:
+GraphRAG/HippoRAG focus on \emph{retrieval} from KGs, while we
+focus on \emph{serialization} of an already-retrieved (or
+in-context-feasible) KG to the LLM.
+
+\paragraph{KG verbalization and seq2seq.}
+KGT5~\citep{saxena2022kgt5} casts KG completion and KGQA as a
+text-to-text task, demonstrating that LLMs trained on linearized
+KGs can perform multi-hop reasoning. Our setting differs in two
+ways: we use general-purpose chat LLMs (no KG-specific training)
+and we evaluate \emph{multiple} surface forms head-to-head on the
+same facts.
+
+\paragraph{Hyper-relational KGs.}
+StarE~\citep{galkin2020stare} provides a message-passing approach
+for hyper-relational KGs, demonstrating that qualifier-augmented
+relations carry information that binary-triple embeddings lose.
+Earlier foundational work includes m-TransH~\citep{wen2016mtransh}
+and NaLP~\citep{guan2019nalp} on n-ary relational data. These
+papers establish that hyper-relational structure is real and
+exploitable for embedding-based tasks. Our finding does not
+contradict this: in-context LLMs handle the same hyper-relational
+structure (C-TQL preserves role players verbatim) just as well
+as flatter forms; the issue is not whether structure can be
+exploited but whether the LLM-facing surface form is the right
+place to expose it.
+
+\paragraph{In-context behavior of LLMs.}
+\emph{Lost in the middle}~\citep{liu2023lostmiddle} documents
+LLMs' positional sensitivity within long contexts. While our
+results do not directly engage this finding (our dumps fit
+comfortably under 32K characters), it reinforces the case that
+in-context surface form interacts with model behavior in
+non-obvious ways. Surface-form effects in retrieval-augmented
+settings are otherwise under-studied; we are not aware of prior
+systematic comparisons of TQL/Cypher/NL/JSON-LD on the same
+underlying facts.
+
+\paragraph{Closed-world reasoning.}
+The closed-world assumption \citep{reiter1978cwa} is foundational
+in knowledge representation. Our finding that in-context KG dumps
+strip closed-world semantics is, in spirit, a re-statement of
+Reiter's distinction in the LLM era: \emph{absence in the dump
+does not entail absence in the world}, and the LLM has no syntactic
+cue to make the closure. To our knowledge, this paper is the first
+to empirically measure the resulting accuracy gap between formal
+KG dumps and natural-language summaries on the same out-of-scope
+queries.
+
+\paragraph{KG surveys and TypeDB.}
+Hogan et al.~\citep{hogan2021kgsurvey} provide a comprehensive
+survey of knowledge graphs that situates hyper-relational
+representation within broader KR. TypeDB v3's TypeQL language is
+documented industrially~\citep{vaticle2023typeql}; to our
+knowledge, no peer-reviewed paper has evaluated TypeDB v3 in a
+production LLM-agent deployment.

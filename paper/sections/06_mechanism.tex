@@ -1,0 +1,147 @@
+\section{Mechanism Findings}\label{sec:mechanism}
+
+The headline result of Section~\ref{sec:results} — that in-context
+surface forms beat the production KG agents — leaves open
+\emph{which} surface form properties drive the gap. Three mechanism
+findings, summarized below, refine the picture.
+
+\subsection{Query-Language Familiarity Dominates LLM-Family Effects}
+
+Three of four LLM families are essentially form-agnostic across the
+four in-context tiers. The form-by-form spread is 6 percentage
+points for HCX-32B-Think (85--91), 3 for Qwen3-235B (90--93), and
+4 for gpt-oss-120b (91--95). Llama-4-Scout is the outlier: a
+21-percentage-point spread driven by a steep drop on the structured
+tiers (C-TQL 63\%, C-Cypher 62\%, C-JSONLD 67\%) while C-NL holds at
+83\%. Figure~\ref{fig:form-sensitivity} visualizes the asymmetry.
+
+\input{figures/form_sensitivity}
+
+The asymmetry traces directly to query-language familiarity in the
+LLM's pre-training corpus. C-TQL's role-player syntax \texttt{(role1:
+\$a, role2: \$b) isa Relation;} appears far less frequently in
+public text than Cypher \texttt{CREATE (a)-[:R]->(b)} or JSON-LD,
+which is itself less common than English prose. Llama-4-Scout's
+weakness on the structured tiers reproduces in production
+\backendname{typedb} (56\%), where the agent must in addition
+\emph{generate} TQL queries — confirming that the bottleneck is not
+the data model but the query-language interface.
+
+\paragraph{Per-category breakdown (Llama-4 C-TQL).}
+Within Llama-4's 63\% on C-TQL, the failure modes are not uniform:
+single-fact extraction tasks remain strong (\texttt{calculation}
+86\%, \texttt{article\_text} 100\%), while cross-reference tasks
+collapse (\texttt{comparison} 38\%, \texttt{multihop\_3key} 47\%,
+\texttt{aggregation} 50\%, \texttt{negation\_exception} 25\%).
+Lookup of one fact survives an unfamiliar syntax; \emph{traversing}
+multiple facts under that syntax does not.
+
+\subsection{In-Context KG Underperforms NL on Boundary Inference}
+
+The previous section's mechanism is about \emph{positive}
+queries — where the answer exists in the data. A symmetric question
+is whether the surface form matters for \emph{negative} queries,
+where the correct answer is "no such fact exists." We isolate the
+six \texttt{out\_of\_scope} questions: each asks for a
+(position, grade), (country, grade), or (allowance) combination
+that is provably absent from the regulation tables. For all six
+questions the in-context dumps contain enough information to derive
+the absence (the position-pay table lists all valid combinations,
+the overseas-pay table lists all six countries, and the article-text
+prefix defines the closed set of allowances).
+
+\input{figures/boundary_oos}
+
+Despite full data coverage, the formal KG dumps under-perform
+natural language on this category. We attribute this to three
+compounding factors:
+
+\begin{enumerate}
+\item \textbf{Cognitive load.} A positive lookup requires one
+      retrieval. A negative lookup requires \emph{enumerating} all
+      candidate facts of the relevant type and verifying that none
+      match — a multi-step reasoning chain that is harder under any
+      surface form, and especially harder when the syntax is
+      unfamiliar.
+\item \textbf{Closed-world ambiguity.} A raw KG dump does not signal
+      whether absence implies "false" (closed world) or "unknown"
+      (open world). The chat model must infer the regime from
+      context. Natural-language summary, by contrast, can carry an
+      explicit boundary clause — "X is defined only for grades $a$
+      and $b$" — verbatim.
+\item \textbf{Missing boundary markers.} TypeQL \texttt{insert}
+      statements and Cypher \texttt{CREATE} statements are inherently
+      assertional: they only express what \emph{is}. There is no
+      natural place to assert what \emph{is not}. JSON-LD and
+      natural-language summaries have, by contrast, easy linguistic
+      affordances for boundary statements.
+\end{enumerate}
+
+\subsection{The KG Semantic Paradox}
+
+The two preceding mechanisms compose into what we call the \emph{KG
+semantic paradox}. The very strengths that make a KG operationally
+valuable — schema-driven structural clarity, explicit role-player
+constraints, integrity rules — disappear or invert when the graph is
+serialized into an in-context prompt for an LLM. The closed-world
+semantics that the operational system relies upon implicitly are
+stripped away in raw dumps; the schema constraints are not
+reproduced as boundary statements; and the formal query language
+that a KG agent could in principle use to express negation
+(\texttt{not \{...\};} in TypeQL) is itself the syntactic regime in
+which LLMs are weakest. The KG's structural strength becomes its
+in-context weakness.
+
+\subsection{Syntax Guides Partially Compensate}
+
+If the bottleneck is query-language familiarity, an
+explicit syntax guide should narrow the gap. We test this with
+Llama-4-Scout, the model with the largest spread, on C-Cypher (its
+weakest formal surface form at 62\%). We prepend a 453-character
+syntax primer — three sentences explaining how Cypher's
+\texttt{CREATE (var:Label \{prop: value\})-[:REL]->(target)}
+notation should be read — and re-run all 100 questions.
+
+\begin{table}[t]
+\centering
+\caption{Llama-4-Scout on C-Cypher with and without a 453-character
+Cypher syntax primer. The guide partially closes the form-sensitivity
+gap, with the largest lifts on cross-reference tasks. Out-of-scope
+\emph{decreases} (--16.7 pp), suggesting that a syntax guide alone
+does not address closed-world boundary inference.}
+\label{tab:guide-cypher}
+\small
+\begin{tabular}{l rrr}
+\toprule
+Category & C-Cypher & C-Cypher+guide & $\Delta$ \\
+\midrule
+single\_lookup        & 40.0\% & 60.0\% & $+20.0$ \\
+comparison            & 46.2\% & 61.5\% & $+15.4$ \\
+aggregation           & 30.0\% & 40.0\% & $+10.0$ \\
+calculation           & 92.9\% & 100\%  & $+7.1$  \\
+multihop\_3key        & 66.7\% & 73.3\% & $+6.7$  \\
+article\_text         & 100\%  & 100\%  & $0$     \\
+term\_normalization   & 100\%  & 100\%  & $0$     \\
+negation\_exception   & 25.0\% & 25.0\% & $0$     \\
+join\_2key            & 60.0\% & 50.0\% & $-10.0$ \\
+out\_of\_scope        & 66.7\% & 50.0\% & $-16.7$ \\
+\midrule
+\textbf{Overall}      & \textbf{62.0\%} & \textbf{67.0\%} & \textbf{$+5.0$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 5-percentage-point overall lift is non-trivial: it confirms that
+syntax familiarity is part of Llama-4's bottleneck, with categories
+demanding cross-reference (comparison, single\_lookup,
+multihop\_3key) showing the largest individual gains. Tellingly,
+\texttt{out\_of\_scope} drops by 16.7 percentage points: a structural
+syntax guide is the wrong remedy for closed-world boundary inference.
+The two mechanisms are distinct and require distinct interventions.
+
+A 16-percentage-point gap to C-NL (83\%) remains even with the
+guide. Syntax familiarity is necessary but not sufficient for closing
+the surface-form gap; some additional load — possibly the
+cross-reference cognitive cost of formal-syntax reading — persists
+beyond what a brief primer can fix. We treat the full guide ablation
+(four LLMs $\times$ three structured tiers) as future work.

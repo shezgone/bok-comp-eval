@@ -1,0 +1,32 @@
+% Table: McNemar paired tests for the main H1 (KG agent vs in-context).
+% Exact two-sided binomial test on discordant pairs. n = 100 per cell.
+\begin{table}[t]
+\centering
+\caption{Paired McNemar exact two-sided binomial tests on 100 discordant
+pairs. Cell format: ``$a$--$b$, $p$'' where $a$ wins on $a$ wrong-$b$
+right pairs and $b$ wins on $b$ wrong-$a$ right pairs. Bold marks
+$p<0.05$.}
+\label{tab:mcnemar}
+\small
+\begin{tabular}{l l c c}
+\toprule
+LLM & Comparison ($A$ vs $B$) & $A$ wins -- $B$ wins & $p$ \\
+\midrule
+\multirow{2}{*}{HCX-32B-Think}
+ & \backendname{typedb} vs \backendname{context}   & 5 -- 26 & \textbf{0.0002} \\
+ & \backendname{neo4j}  vs \backendname{context}   & 4 -- 23 & \textbf{0.0003} \\
+\midrule
+\multirow{2}{*}{Qwen3-235B}
+ & \backendname{typedb} vs \backendname{context}   & 7 -- 14 & 0.189 \\
+ & \backendname{neo4j}  vs \backendname{context}   & 5 -- 18 & \textbf{0.011} \\
+\midrule
+\multirow{2}{*}{Llama-4-Scout}
+ & \backendname{typedb} vs \backendname{context}   & 3 -- 23 & \textbf{0.0001} \\
+ & \backendname{neo4j}  vs \backendname{context}   & 5 -- 16 & \textbf{0.027} \\
+\midrule
+\multirow{2}{*}{gpt-oss-120b}
+ & \backendname{typedb} vs \backendname{context}   & 8 -- 19 & 0.052 \\
+ & \backendname{neo4j}  vs \backendname{context}   & 8 -- 22 & \textbf{0.016} \\
+\bottomrule
+\end{tabular}
+\end{table}

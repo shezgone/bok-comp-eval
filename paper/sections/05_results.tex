@@ -1,0 +1,88 @@
+\section{Main Results}\label{sec:results}
+
+\input{tables/overall_acc}
+
+Table~\ref{tab:overall-acc} reports overall accuracy on 100 questions
+for the full $4\times 8$ matrix of LLM families and backends. Three
+patterns emerge.
+
+\subsection{Production KG agents underperform in-context surface forms}
+
+Across every LLM family, the in-context surface forms outperform the
+production KG agents. Mean accuracy of the four in-context tiers
+exceeds mean accuracy of the two KG agents by 8.25 percentage points
+(Llama-4-Scout, the smallest gap), 17.0 (HCX), 22.0 (Qwen-235B), and
+26.0 (gpt-oss-120b). Figure~\ref{fig:kg-vs-incontext} visualizes the
+gap.
+
+\input{figures/main_bar}
+
+This is counterintuitive in two ways. First, the KG agents
+\emph{strictly} have access to more facts than the in-context dumps:
+the production TypeDB and Neo4j stores contain entities that we did
+not include in the in-context dumps (career tracks, allowance entities,
+12 supplementary clauses, and three additional base-salary tables for
+non-comprehensive-planning grades). Second, the KG agents are designed
+exactly for multi-hop and multi-key queries — the regime in which the
+in-context tiers should struggle most.
+
+To test the gap rigorously we run paired McNemar exact two-sided
+binomial tests on discordant pairs (Table~\ref{tab:mcnemar}). Of eight
+KG-vs-context comparisons, five are statistically significant at
+$p<0.05$, two are borderline ($p=0.052$), and only one (Qwen-235B
+\backendname{typedb} vs \backendname{context}) fails to reject the
+null. The win counts in the discordant column tell the story: in
+HCX the KG agents win at most 5 questions while the context agent
+wins 26.
+
+\input{tables/mcnemar}
+
+\subsection{The query-generation stage is the bottleneck, not KG expressivity}
+
+The KG agents and the in-context dumps differ in exactly one
+operational respect: the KG agents \emph{generate a query} (TypeQL or
+Cypher) whose results they then verbalize, while the in-context dumps
+hand the full graph directly to the chat model. Since the in-context
+dumps preserve the same hyper-relational role-player structure
+(C-TQL) or property-graph structure (C-Cypher) that the KG agents
+exploit operationally, any drop in KG-agent accuracy must be
+attributed to the additional pipeline stages: query authoring, query
+execution, and result re-verbalization. The 8--26 percentage-point
+gap therefore quantifies the cumulative loss of those stages — the
+\emph{query-generation bottleneck}.
+
+\subsection{Closed-book leakage is low}
+
+The \backendname{closed\_book} baselines achieve 9--13\% on the same
+100 questions, with a four-LLM mean of 11.25\%. This bounds the
+contribution of pre-training memorization to RAG performance: the
+75--80 point gap between any RAG-style backend and
+\backendname{closed\_book} is genuine retrieval, not regurgitation
+of memorized facts.
+
+\subsection{Natural-language summary Pareto-dominates structured surface forms}
+
+Among the in-context tiers, C-NL achieves the highest mean accuracy
+(89.8\% across LLMs) at less than half the token cost of the
+structured tiers (14K characters vs.\ 26--32K).
+Table~\ref{tab:token-cost} and Figure~\ref{fig:pareto} display the
+trade-off.
+
+\input{tables/token_cost}
+\input{figures/nl_pareto}
+
+The structured tiers (TQL, Cypher, JSON-LD) bring no accuracy benefit
+proportional to their token overhead. The single exception —
+gpt-oss-120b on C-TQL at 95\% — does not generalize: Llama-4-Scout
+falls to 63\% on the same surface form, dragging down the C-TQL
+mean. C-NL is the only surface form that maintains $\geq 83\%$
+accuracy across all four LLMs.
+
+\subsection{Multi-key categories: the regime KG agents are designed for}
+
+Restricting to the H1-relevant categories — \texttt{calculation},
+\texttt{comparison}, \texttt{multihop\_3key} (42 questions total) —
+sharpens the picture: the KG agents range from 41\% to 64\% on this
+subset while the in-context tiers reach 90--100\%. The regime that
+hyper-relational KGs are operationally tailored for is precisely
+where the in-context full-graph dumps win largest.

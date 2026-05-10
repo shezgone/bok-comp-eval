@@ -1,0 +1,50 @@
+\section{Conclusion}\label{sec:conclusion}
+
+We have shown, on a 100-question Korean public-sector regulation
+benchmark with four LLM families, that the production KG-RAG
+agents — built on TypeDB v3 and Neo4j — underperform an in-context
+surface-form ablation of the \emph{same} knowledge graph by
+8--26 percentage points (paired McNemar $p<0.05$ in 5 of 8
+KG-vs-context comparisons). The result holds despite the agents
+having strictly more data and being deployed for exactly the
+multi-key reasoning regime they appear designed to dominate.
+
+The bottleneck is the query-generation stage of the KG agent, not
+the expressivity of the KG itself: an in-context dump that
+preserves the same hyper-relational role-player structure reaches
+83--95\% accuracy. Within that in-context regime, natural-language
+summary Pareto-dominates the formal surface forms (TypeQL, Cypher,
+JSON-LD) on both accuracy and token cost, and the only LLM family
+sensitive to structural surface-form (Llama-4-Scout) reveals a
+secondary mechanism: pre-training query-language familiarity that
+syntax guides only partly compensate for. A third mechanism — the
+\emph{KG semantic paradox} — shows that the very structural clarity
+that makes a KG operationally valuable disappears when serialized,
+hurting closed-world boundary inference relative to natural
+language.
+
+We argue that KG infrastructure should be treated as the
+\emph{operational backbone} of the system — schema enforcement,
+multi-system integration, query-agent improvement potential — and
+that its LLM-facing layer should be a structure-preserving
+natural-language summary, augmented with explicit boundary
+annotations. The reframing is constructive rather than dismissive:
+KGs remain irreplaceable for the operational dimensions, and the
+gap between the production KG agent and the in-context tier is a
+roadmap for stronger query-generation models, not a verdict on
+KG expressivity.
+
+\paragraph{Future work.}
+We outline three priorities in Section~\ref{sec:limits}:
+multi-domain replication beyond Korean public-sector regulation,
+explicit-boundary NL variants with quantified lift on the
+out-of-scope category, and external-baseline comparison
+(GraphRAG, HippoRAG) on the same evaluation set.
+
+\paragraph{Reproducibility.}
+The evaluation set, scorer, runner, and surface-form dump
+generators are released at
+\url{https://github.com/shezgone/bok-comp-eval}. Three of the four
+LLM families used (Qwen3-235B, Llama-4-Scout, gpt-oss-120b) are
+open-weight; replication on their HuggingFace checkpoints
+reproduces the in-context-tier numbers.

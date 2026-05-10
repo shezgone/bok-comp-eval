@@ -1,0 +1,32 @@
+% Table: Overall accuracy across 4 LLM families × 8 backends.
+% n = 100 questions. Bracketed numbers are 95% bootstrap confidence intervals
+% (2,000 resamples).
+\begin{table}[t]
+\centering
+\caption{Overall accuracy on 100 questions across four LLM families and eight
+backends. Bracketed values are 95\% bootstrap confidence intervals
+(2{,}000 resamples). Bold marks the best in-context surface form per LLM;
+italics mark the best KG agent.}
+\label{tab:overall-acc}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l rrrr}
+\toprule
+Backend & HCX-32B-Think & Qwen3-235B & Llama-4-Scout & gpt-oss-120b \\
+\midrule
+\multicolumn{5}{l}{\emph{Production KG-RAG agents (Setting B: Qwen-Coder query agent)}} \\
+\backendname{typedb}     & 58 [48, 68] & \emph{73} [64, 81] & 56 [46, 66] & \emph{68} [58, 77] \\
+\backendname{neo4j}      & \emph{60} [50, 69] & 67 [58, 76] & \emph{65} [56, 74] & 65 [56, 74] \\
+\midrule
+\multicolumn{5}{l}{\emph{Reference baselines}} \\
+\backendname{context} (production retrieval) & 79 [71, 87] & 80 [72, 88] & 76 [67, 85] & 79 [71, 87] \\
+\backendname{closed\_book} (no retrieval) & 10 [4, 16] & 13 [7, 20] & 9 [4, 15] & 13 [6, 20] \\
+\midrule
+\multicolumn{5}{l}{\emph{In-context surface-form ablation (full-graph dump)}} \\
+\backendname{C-TQL}      & 85 [78, 92] & 90 [84, 95] & 63 [54, 72] & \textbf{95} [90, 99] \\
+\backendname{C-Cypher}   & 86 [79, 92] & 92 [86, 97] & 62 [53, 71] & 91 [85, 96] \\
+\backendname{C-NL}       & \textbf{91} [85, 96] & \textbf{93} [88, 98] & \textbf{83} [75, 90] & 92 [86, 97] \\
+\backendname{C-JSONLD}   & 89 [83, 95] & \textbf{93} [88, 98] & 67 [57, 76] & 92 [86, 97] \\
+\bottomrule
+\end{tabular}
+\end{table}

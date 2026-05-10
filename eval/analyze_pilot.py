@@ -35,6 +35,7 @@ from eval.scorer import load_jsonl, score_item  # noqa: E402
 BACKENDS = [
     "typedb", "neo4j", "context", "closed_book",
     "context_tql", "context_cypher", "context_nl", "context_jsonld",
+    "context_tql_guide", "context_cypher_guide", "context_jsonld_guide",
 ]
 KG_BACKENDS = ["typedb", "neo4j"]
 CONTEXT_TIER_BACKENDS = [

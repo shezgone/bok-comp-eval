@@ -1,0 +1,81 @@
+\section{Appendix}\label{sec:appendix}
+
+\subsection{Setting A vs.\ Setting B (Pilot)}
+
+In an early 30-question pilot we measured the KG agents under
+\emph{Setting A}, in which a single LLM played both reasoner and
+query-author roles, before fixing the query agent at
+Qwen3-Coder-30B (Setting B). Setting A produced strongly asymmetric
+results across LLM families that confounded the headline KG-vs-
+context comparison:
+
+\begin{itemize}
+\item Qwen3-235B-Instruct on \backendname{typedb}: 83\% in
+      Setting A, 77\% in Setting B (--6 pp; the larger general
+      model authored TQL more fluently than the smaller coder).
+\item Qwen3-235B-Instruct on \backendname{neo4j}: 60\% in
+      Setting A, 83\% in Setting B (+23 pp; Cypher is more
+      represented in Qwen-Coder's training).
+\item HCX on \backendname{typedb}: 60\% in Setting A, 63\% in
+      Setting B (+3 pp).
+\end{itemize}
+
+The asymmetry confirms that single-LLM measurements conflate KG-
+backend effects with query-language familiarity. Setting B isolates
+the chat-model variable; all main-paper numbers are Setting B.
+
+\subsection{Surface-Form Sample Excerpts}
+
+For reference, the same fact —"a Grade-1 employee in the position
+\emph{부서장(가)} (Department Head Type-1) has an annual
+position-pay of 18{,}192{,}000 KRW"— is rendered in the four
+in-context tiers as follows.
+
+\paragraph{C-TQL.}
+\begin{verbatim}
+$g1 isa 직급, has 직급명 "1급", has 직급서열 1;
+$p_bsg_a isa 직위, has 직위명 "부서장(가)";
+$pp_P01_1급 isa 직책급기준, has 직책급액 18192000;
+(해당직급:$g1, 해당직위:$p_bsg_a, 적용기준:$pp_P01_1급) isa 직책급결정;
+\end{verbatim}
+
+\paragraph{C-Cypher.}
+\begin{verbatim}
+CREATE (g1:JobGrade {name: "1급", order: 1});
+CREATE (p_bsg_a:Position {code: "P01", name: "부서장(가)"});
+CREATE (pp_P01_1급:PositionPay {annual_amount: 18192000});
+CREATE (g1)-[:HAS_POSITION_PAY]->(pp_P01_1급);
+CREATE (p_bsg_a)-[:HAS_POSITION_PAY]->(pp_P01_1급);
+\end{verbatim}
+
+\paragraph{C-NL.}
+\begin{quote}
+부서장(가) 직위에 있는 1급 직원의 연간 직책급은 18,192,000원이다.
+\end{quote}
+
+\paragraph{C-JSONLD.}
+\begin{verbatim}
+{
+  "직책급": [
+    {"직위코드": "P01", "직위명": "부서장(가)",
+     "직급": "1급", "연간직책급": 18192000}
+  ]
+}
+\end{verbatim}
+
+\subsection{Cypher Syntax Guide (Section 6.4)}
+
+The 453-character Cypher primer prepended to C-Cypher+guide for the
+Llama-4-Scout ablation:
+
+\begin{quote}\small
+\textit{[The Cypher dump represents a Neo4j property graph. Read
+\texttt{CREATE (var:Label \{prop: value, ...\})} as defining a node
+of the given label with properties; read
+\texttt{CREATE (a)-[:REL\_TYPE \{prop: value\}]->(b)} as a directed
+binary relationship from \texttt{a} to \texttt{b} with optional
+edge properties. Same variables refer to the same node across
+statements. Multi-arity facts (e.g., position pay with both
+position and grade) are flattened by introducing intermediate
+nodes connected to all participants.]}
+\end{quote}

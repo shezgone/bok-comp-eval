@@ -1,0 +1,92 @@
+\section{Production System}\label{sec:system}
+
+The system under evaluation is a deployed retrieval-augmented agent
+serving compensation-policy questions over the Bank of Korea
+Compensation Regulations. We summarize the architecture as it informs
+our evaluation choices.
+
+\subsection{Three Storage Backbones}
+
+The same set of facts is materialized in three forms.
+
+\paragraph{TypeDB v3 (hyper-relational graph).} The entire fact base
+is loaded as a TypeQL ontology with N-ary relations and explicit
+roles. A position-pay fact, for example, is stored as a single
+relation \texttt{(해당직급:\$g, 해당직위:\$p, 적용기준:\$ref) isa
+직책급결정}, in which the (job-grade, position, position-pay-amount)
+triple co-participate in one fact rather than being decomposed into
+binary edges. The schema (\texttt{schema/compensation\_regulation.tql})
+defines 17 entity types, 8 N-ary relation types, and 35 attributes.
+
+\paragraph{Neo4j (property graph).} The same data is loaded as a Neo4j
+property graph in which N-ary relations are flattened: each
+hyper-relational role-player tuple becomes a binary edge with extra
+properties on the edge or on intermediate nodes. The Neo4j store has
+9 node labels (e.g., \texttt{JobGrade}, \texttt{PositionPay},
+\texttt{OverseasPay}) and 7 relationship types
+(\texttt{HAS\_BASE\_SALARY}, \texttt{HAS\_POSITION\_PAY}, etc.).
+
+\paragraph{Preprocessed context document.} A markdown
+\texttt{regulation\_context.md} consolidates the article text (제2조
+through 제15조), term-normalization rules (e.g., \texttt{G5 =
+종합기획직원 5급}), calculation formulas, and four JSON lookup blocks
+(salary differential, position pay, overseas salary, salary table).
+This document is the input to the \backendname{context} backend,
+which performs production-style chunked retrieval before invoking
+the chat LLM.
+
+\subsection{ReAct Agent}
+
+The KG agents (\backendname{typedb} and \backendname{neo4j}) are
+LangGraph state machines following a ReAct pattern. A typical step
+proceeds:
+
+\begin{enumerate}
+\item The chat model receives the user question and a schema
+      summary, and decides whether a database query is needed.
+\item If a query is needed, control passes to the query model, which
+      authors a TypeQL or Cypher query against the loaded schema.
+\item The query is executed; results return as structured rows.
+\item The chat model verbalizes the results into a natural-language
+      answer, optionally citing schema rules.
+\end{enumerate}
+
+A failed parse triggers retry with the parse error fed back into the
+prompt; the agent budget is capped at three query attempts per
+question.
+
+\subsection{Decoupled Query Agent (Setting B)}
+
+The production code separates the chat model
+(\texttt{create\_chat\_model()}) from the query model
+(\texttt{create\_qwen\_model()}) by design: the original deployment
+uses Qwen-Coder for query authoring even when the chat model is HCX.
+For our evaluation we honour this separation by holding the query
+model fixed at \texttt{Qwen3-Coder-30B-A3B-Instruct} and varying only
+the chat model.
+
+This decoupling matters: a pilot in which the same LLM played both
+roles produced highly asymmetric results across LLM families,
+confounding the KG vs.\ context comparison. The pilot is reported as
+Setting A in Appendix~\ref{sec:appendix}; all main numbers in this
+paper are Setting B.
+
+\subsection{In-Context Surface-Form Tiers}
+
+To isolate the contribution of the query-generation stage from the
+intrinsic readability of the KG, we add four in-context backends that
+side-step the agent entirely. Each constructs a single fixed prompt
+of the form
+
+\begin{quote}\small
+\texttt{[article-text prefix common to all tiers]} \\[2pt]
+\texttt{=== 자료 시작 ===} \\
+\texttt{[KG dump in tier-specific surface form]} \\
+\texttt{=== 자료 끝 ===}
+\end{quote}
+
+and invokes the chat model with this prompt as the system message and
+the user question as the user message. The four surface forms (TQL,
+Cypher, NL, JSON-LD) are produced from the same underlying source
+tables (\texttt{eval/dump\_context\_tiers.py}), so any difference in
+accuracy between tiers is purely a surface-form effect.

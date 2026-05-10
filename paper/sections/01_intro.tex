@@ -1,0 +1,95 @@
+\section{Introduction}\label{sec:intro}
+
+Production retrieval-augmented question-answering systems are
+increasingly built on top of knowledge graphs (KGs). For domains where
+facts are inherently multi-relational — public-sector regulations,
+clinical guidelines, organizational policies — the canonical argument
+for a KG backbone runs as follows. Natural-language documents lose
+the schema-driven structure that the regulation \emph{has} as a fact
+base. A binary triple store flattens N-ary relations and forces
+either lossy decomposition or awkward reification. A
+hyper-relational KG (e.g., TypeDB v3) preserves the original role-
+player structure faithfully, and a ReAct-style agent can in principle
+exploit that structure via formal queries (TypeQL, Cypher) for
+multi-hop reasoning.
+
+This paper reports a counterintuitive finding from a production
+deployment of exactly such a system. Over the Bank of Korea
+Compensation Regulations — a 200-page Korean public-sector document
+with eight N-ary fact tables and twelve supplementary clauses — we
+evaluate four LLM families against eight backends (TypeDB
+hyper-relational agent, Neo4j property-graph agent, production
+chunked-context retriever, closed-book LLM, and four
+\emph{in-context surface-form} variants in which the entire KG is
+serialized into the prompt as TypeQL, Cypher, JSON-LD, or natural
+language). The benchmark is 100 questions covering ten categories,
+including 42 multi-key questions that stress the supposed strength
+of the hyper-relational KG.
+
+The headline result is that the production KG agents
+\emph{underperform} every in-context surface form by 8--26
+percentage points (paired McNemar $p<0.05$ in 5 of 8 KG-vs-context
+comparisons). Three observations make this counterintuitive:
+(i) the KG agents have access to \emph{strictly more facts} than
+the in-context dumps; (ii) the gap is largest exactly in the
+multi-key categories that the KG was designed to serve; and
+(iii) the closed-book baseline is at 9--13\%, ruling out
+pre-training memorization as the explanation.
+
+The surface-form ablation localizes the bottleneck. Four findings
+result.
+
+\begin{enumerate}
+\item \textbf{The query-generation stage, not KG expressivity, is
+      the dominant accuracy determinant.} An in-context dump with
+      the same hyper-relational structure as the KG store reaches
+      83--95\% accuracy across LLMs, while the production agent
+      built on top of the KG reaches 56--73\%. The 8--26 percentage
+      points lost between the two are absorbed by the agent's
+      query-authoring, query-execution, and result-verbalization
+      stages.
+\item \textbf{Natural-language summary Pareto-dominates structured
+      surface forms.} Across LLMs, NL achieves a mean accuracy of
+      89.8\% at 14K characters, beating the structured tiers
+      (TQL/Cypher/JSON-LD) at 83--85\% and 26--32K characters.
+\item \textbf{Llama-4-Scout exhibits a 21-percentage-point form
+      sensitivity that other LLMs do not.} The asymmetry traces to
+      query-language familiarity in pre-training, with single-fact
+      lookups surviving unfamiliar syntax but cross-reference tasks
+      collapsing — a finding directly testable via guide ablation.
+\item \textbf{In-context KG paradoxically underperforms NL on
+      closed-world boundary inference.} The structural strength of
+      the KG (schema-driven clarity, integrity rules) is stripped
+      away when serialized; the resulting raw dump leaves the LLM
+      to enumerate-and-disprove rather than read an explicit
+      boundary clause.
+\end{enumerate}
+
+We argue for a reframing of KG infrastructure value: the KG should
+be treated as the \emph{operational backbone} of the system —
+schema enforcement, multi-system integration, latent expressivity
+for stronger query agents — rather than as the LLM-facing surface
+form. As a practical recommendation, we propose adding a
+KG-to-natural-language conversion layer between the KG store and
+the LLM, augmented with explicit boundary annotations to address
+the closed-world inference gap. Section~\ref{sec:discussion}
+develops these implications.
+
+\subsection*{Contributions}
+
+\begin{itemize}
+\item We report the first production-deployment evaluation of
+      TypeDB v3 hyper-relational and Neo4j property-graph KGs
+      against a four-tier in-context surface-form ablation
+      (Section~\ref{sec:results}).
+\item We demonstrate that the query-generation stage is the
+      dominant accuracy bottleneck in current KG-RAG agents,
+      not KG expressivity (Section~\ref{sec:results}).
+\item We identify and decompose two distinct surface-form
+      mechanisms — query-language familiarity and closed-world
+      boundary inference — and show that they require distinct
+      remedies (Section~\ref{sec:mechanism}).
+\item We articulate the \emph{KG semantic paradox} and recommend
+      a KG-to-NL conversion layer as the practical next step for
+      KG-LLM pipelines (Section~\ref{sec:discussion}).
+\end{itemize}

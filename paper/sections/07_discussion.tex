@@ -1,0 +1,98 @@
+\section{Discussion}\label{sec:discussion}
+
+\subsection{KG Infrastructure as Operational Backbone, Not LLM Interface}
+
+Our results suggest a reframing of KG infrastructure value in the
+LLM era. The conventional motivation for deploying a hyper-relational
+KG in front of an LLM is the expressivity argument: the KG can
+faithfully represent N-ary facts and structural constraints that
+binary triples or natural language cannot. Our data shows that this
+expressivity argument does not transfer to the LLM-facing
+interface — given the same facts in-context, all surface forms
+including natural language reach $\geq 83\%$ accuracy, with NL the
+Pareto winner on accuracy and token cost simultaneously.
+
+The value of KG infrastructure therefore lies elsewhere. We identify
+four operational dimensions in which KGs remain critical:
+
+\begin{enumerate}
+\item \textbf{Production scalability.} Schema enforcement, integrity
+      constraints, concurrency control, and ACID transactions are
+      properties of the database backbone, not of any single
+      LLM-facing prompt. A KG store provides these for free; an
+      LLM-prompt pipeline that holds facts only in JSON files has to
+      re-implement them.
+\item \textbf{Multi-system source of truth.} A KG can serve a chat
+      LLM, a BI dashboard, an audit pipeline, and an internal API
+      from a single fact store. The LLM interface is one of many
+      consumers; the KG's role is integration substrate.
+\item \textbf{Boundary-and-rule encoding.} Schema constraints
+      (cardinality, role types, mandatory attributes) and explicit
+      negation queries (\texttt{not \{...\};}) let a KG agent reason
+      about \emph{absence} in a way an in-context dump cannot. The
+      mechanism findings of Section~\ref{sec:mechanism} suggest that
+      the largest residual KG advantage — closed-world boundary
+      inference — is best exploited via the agent's query interface,
+      not the LLM's reading of a raw dump.
+\item \textbf{Latent expressivity for stronger query agents.} Today
+      the query-generation LLM is the bottleneck. As specialized
+      coder LLMs improve at TypeQL, Cypher, and similar domain
+      languages, the production KG agent's accuracy is bounded above
+      by KG expressivity, not by surface form. The current 30-point
+      gap may be closeable from the agent side, not the
+      surface-form side.
+\end{enumerate}
+
+\subsection{Practical Recommendations for KG-LLM Pipelines}
+
+Our findings yield four concrete recommendations.
+
+\paragraph{Recommendation 1: Add a KG-to-NL conversion layer.} For
+in-context QA, structure-preserving NL summary outperforms TypeQL,
+Cypher, and JSON-LD on both accuracy and token cost. Generation can
+be templated (one sentence per fact) and is fully deterministic
+from the source data. Production should ship this layer between the
+KG store and the chat LLM, treating the structured surface forms as
+debug or audit views rather than the LLM-facing form.
+
+\paragraph{Recommendation 2: Augment NL with explicit boundary
+annotations.} The mechanism analysis showed that even NL loses some
+out-of-scope accuracy because the dump enumerates only positive
+facts. Adding a boundary clause per relation — \emph{"X is defined
+only for grades $a$ and $b$; other grades are not in this table"} —
+is a deterministic transformation from the schema and should lift
+out-of-scope accuracy further. We treat measurement of this lift
+as future work.
+
+\paragraph{Recommendation 3: Specialize the query-generation LLM.}
+Setting B's query-model fix to Qwen3-Coder partially explains why
+Llama-4-Scout's KG agent (56\%) is worse than its in-context tier
+(63\%): the chat-side syntax weakness compounds with the absent
+syntax-aware specialization on the query side. As the available
+specialized coder models grow more competent at KG query languages,
+we expect the production-agent / in-context gap to narrow from the
+agent side. Practitioners should track coder-LLM benchmarks for
+TypeQL and Cypher as a leading indicator.
+
+\paragraph{Recommendation 4: Treat KG as backbone, not interface.}
+The four dimensions in Section~7.1 motivate keeping the KG store as
+the source of truth and the integration substrate. The LLM
+interface above it should be a thin NL-summary layer with optional
+agent fall-through for queries the summary cannot answer (e.g.,
+counts, filters, multi-hop traversals beyond the summary template).
+This inverts the common architecture in which the KG agent is
+\emph{primary} and a context document is the fall-back.
+
+\subsection{Relation to Counterintuitive H1}
+
+The pre-experiment hypothesis — "even a maximally preprocessed
+context-RAG cannot match a hyper-relational KG agent on multi-key
+queries" — is rejected by our data ($p<0.05$ in 5/8 KG-vs-context
+comparisons, all in the opposite direction). The data
+\emph{does} support a different counterintuitive claim: that the
+production KG agent's query-generation stage, not the KG's
+expressivity, is the dominant accuracy determinant in this
+deployment regime. This new claim shares the original's
+counterintuitive framing — practitioners typically assume that more
+structure leads to better LLM downstream performance — while being
+directly evidenced by the surface-form ablation.

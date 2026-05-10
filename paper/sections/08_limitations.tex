@@ -1,0 +1,74 @@
+\section{Limitations and Future Work}\label{sec:limits}
+
+\paragraph{Single domain, single language.}
+The evaluation domain is one Korean public-sector compensation
+regulation. Generalization to other regulatory domains, to English
+or other languages, and to private-sector enterprise data is left to
+future work. Two of the four LLM families (HCX-32B-Think, Qwen3-235B)
+have substantial Korean pre-training; the other two (Llama-4-Scout,
+gpt-oss-120b) are predominantly English. Form-sensitivity findings
+should be interpreted within this LLM-family mix.
+
+\paragraph{Sample size.}
+The 100-question evaluation set is balanced across ten categories
+but yields modest per-category power: the
+\texttt{out\_of\_scope} category in particular has $n=6$, so the
+boundary-inference finding (Section~6.2) is qualitative. Scaling
+to 1{,}000+ questions, with explicit balance toward boundary and
+multi-key categories, is the highest-priority follow-on.
+
+\paragraph{Production-agent specifics.}
+The KG-agent results are tied to one specific production
+implementation (LangGraph ReAct with three-attempt retries). A
+different agent — for example, a graph-aware retrieval-then-rerank
+pipeline like GraphRAG \citep{edge2024graphrag} or a
+PageRank-driven retriever like HippoRAG
+\citep{gutierrez2024hipporag} — could close some of the
+30-percentage-point gap. We do not include such external baselines
+in the present paper; doing so is a critical next step before
+generalizing the "query-generation bottleneck" claim beyond
+ReAct-style agents.
+
+\paragraph{Surface forms covered.}
+We test four surface forms (TQL, Cypher, NL, JSON-LD). Other
+surface forms — RDF/Turtle, the OpenIE-style triple format used by
+some retrieval pipelines, and graph-summary text from GraphRAG —
+remain untested. The Pareto-optimality claim for NL is strictly
+within the four tested forms.
+
+\paragraph{Schema coverage of in-context dumps.}
+The in-context dumps cover the core fact tables (salary, position
+pay, differential, cap, wage peak, bonus rate, overseas pay,
+starting step, six categories of position) but omit several
+production-side entities: career-track entities, allowance entities,
+12 supplementary clauses (부칙) with their override relations, and
+salary tables for non-comprehensive-planning grades (GA/CL/PO).
+The KG agents have full graph access; the in-context tiers do not.
+The asymmetry favors the KG agents, which makes the observed in-
+context-tier advantage \emph{stronger} than the headline numbers
+suggest.
+
+\paragraph{Single non-reasoning configuration.}
+All chat LLMs run in non-reasoning mode (no thinking-flag
+activation, no chain-of-thought scaffolding). Whether reasoning
+modes — particularly for HCX-32B-Think and gpt-oss-120b — would
+narrow the KG-agent gap is a natural ablation we leave as future
+work.
+
+\paragraph{Closed-book leakage.}
+Closed-book accuracy is uniformly $\leq 13\%$, indicating low
+pre-training memorization of these specific Korean compensation
+facts. However, the four LLMs have heterogeneous training cutoffs
+and language coverage, and we do not control for the precise
+publication date of training corpora. Replication on data published
+\emph{after} all model cutoffs would strengthen the claim that the
+RAG accuracy gap is genuinely retrieval, not memorization.
+
+\paragraph{Future work.}
+Beyond the items above, we identify three directions: (i) systematic
+guide ablation across all four LLMs and three formal surface forms,
+(ii) explicit-boundary NL variants with measured lift on
+\texttt{out\_of\_scope} and \texttt{negation\_exception}, and (iii)
+multi-domain extension covering at least one English-language
+regulatory corpus to test cross-language transfer of the
+form-sensitivity mechanism.

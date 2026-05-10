@@ -1,0 +1,83 @@
+% ============================================================================
+% Hyper-Relational KG vs In-Context LLM Reading: Where Does the Bottleneck Lie?
+% A Production-Realistic Evaluation on the Bank of Korea Compensation Regulations
+% ============================================================================
+% Target: ISWC 2026 In-Use Track (Springer LNCS, ~16 pages)
+%
+% Build:
+%   xelatex main && bibtex main && xelatex main && xelatex main
+% (XeLaTeX needed for kotex Korean rendering of inline domain examples.)
+%
+% NOTE: This skeleton uses the standard \documentclass{article} for portability.
+% When migrating to the official LNCS template, replace the class line with
+%   \documentclass[runningheads]{llncs}
+% and drop article-only packages (geometry, fancyhdr) that LNCS overrides.
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+% --- Geometry / typography ---
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+
+% --- Korean (XeLaTeX + kotex). Comment out if compiling with pdflatex. ---
+\usepackage{kotex}
+
+% --- Math, symbols ---
+\usepackage{amsmath,amssymb}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+
+% --- Graphics / TikZ ---
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{pgfplotstable}
+
+% --- Cross-refs / hyperlinks ---
+\usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
+
+% --- Bibliography (LNCS uses splncs04.bst; for now use plain numeric) ---
+\usepackage[numbers,sort&compress]{natbib}
+
+% --- Custom commands ---
+\newcommand{\krw}[1]{#1\,KRW}
+\newcommand{\backendname}[1]{\texttt{#1}}
+
+\title{Where Does the KG-RAG Bottleneck Lie?\\
+A Production-Realistic Evaluation of Hyper-Relational Knowledge Graphs vs.\
+In-Context Surface Forms}
+
+\author{Yongmin Kim\thanks{NAVER Corp.}\\
+\texttt{kim.yongmin@navercorp.com}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\input{sections/abstract}
+
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/03_system}
+\input{sections/04_setup}
+\input{sections/05_results}
+\input{sections/06_mechanism}
+\input{sections/07_discussion}
+\input{sections/08_limitations}
+\input{sections/09_conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\appendix
+\input{sections/A_appendix}
+
+\end{document}

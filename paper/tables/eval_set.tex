@@ -1,0 +1,27 @@
+% Table: Evaluation set distribution (10 categories x 100 questions).
+\begin{table}[t]
+\centering
+\caption{Evaluation set: 100 questions across ten categories. Multi-key
+categories (calculation, comparison, multihop\_3key) total 42 questions
+to ensure statistical power for the H1 comparison.}
+\label{tab:eval-set}
+\small
+\begin{tabular}{l r r r}
+\toprule
+Category & Seed & Auto-expanded & Total \\
+\midrule
+single\_lookup        & 3 & 7 & 10 \\
+join\_2key            & 3 & 7 & 10 \\
+\textbf{multihop\_3key} & 3 & 12 & \textbf{15} \\
+\textbf{calculation}    & 4 & 10 & \textbf{14} \\
+\textbf{comparison}     & 3 & 10 & \textbf{13} \\
+aggregation           & 3 & 7 & 10 \\
+article\_text         & 3 & 5 & 8 \\
+negation\_exception   & 3 & 5 & 8 \\
+out\_of\_scope        & 2 & 4 & 6 \\
+term\_normalization   & 3 & 3 & 6 \\
+\midrule
+\textbf{Total}        & \textbf{30} & \textbf{70} & \textbf{100} \\
+\bottomrule
+\end{tabular}
+\end{table}
