@@ -8,9 +8,10 @@ context retriever, and a closed-book baseline — alongside four
 in-context surface forms in which the entire knowledge graph is dumped
 into the prompt as TypeQL, Cypher, JSON-LD, or natural language.
 Counterintuitively, the production knowledge-graph agents underperform
-the in-context surface forms by 21--30 percentage points on multi-key
-queries (paired McNemar $p<0.05$ in 5 of 8 comparisons), despite the
-agents having strictly more data. Disentangling \emph{query generation}
+the in-context surface forms by 8--29 percentage points overall and
+18--42 percentage points on the multi-key subset (paired McNemar
+$p<0.05$ in 5 of 8 comparisons; the remaining three are borderline at
+$p\le 0.19$), despite the agents having strictly more data. Disentangling \emph{query generation}
 from \emph{KG expressivity}, we find that natural-language summary of
 the same KG facts is Pareto-optimal in the (accuracy, token cost)
 frontier (88.75\% mean accuracy, 14K vs 32K characters), and that one

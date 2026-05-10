@@ -11,9 +11,9 @@ patterns emerge.
 Across every LLM family, the in-context surface forms outperform the
 production KG agents. Mean accuracy of the four in-context tiers
 exceeds mean accuracy of the two KG agents by 8.25 percentage points
-(Llama-4-Scout, the smallest gap), 17.0 (HCX), 22.0 (Qwen-235B), and
-26.0 (gpt-oss-120b). Figure~\ref{fig:kg-vs-incontext} visualizes the
-gap.
+(Llama-4-Scout, the smallest gap), 22.0 (Qwen3-235B), 26.0
+(gpt-oss-120b), and 28.75 (HCX-32B-Think, the largest).
+Figure~\ref{fig:kg-vs-incontext} visualizes the gap.
 
 \input{figures/main_bar}
 
@@ -82,7 +82,10 @@ accuracy across all four LLMs.
 
 Restricting to the H1-relevant categories — \texttt{calculation},
 \texttt{comparison}, \texttt{multihop\_3key} (42 questions total) —
-sharpens the picture: the KG agents range from 41\% to 64\% on this
-subset while the in-context tiers reach 90--100\%. The regime that
-hyper-relational KGs are operationally tailored for is precisely
-where the in-context full-graph dumps win largest.
+sharpens the picture: the KG agents range from 47.6\% to 66.7\%
+on this subset (mean 57\%) while the in-context tiers reach
+57.1\%--100\% (mean 90\%). The regime that hyper-relational KGs are
+operationally tailored for is precisely where the in-context
+full-graph dumps win largest, with per-LLM multi-key gaps of
+17.9, 32.7, 39.9, and 41.7 percentage points (Llama-4-Scout,
+Qwen3-235B, HCX-32B-Think, gpt-oss-120b respectively).

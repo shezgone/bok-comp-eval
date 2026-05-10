@@ -41,10 +41,14 @@ We evaluate eight backends grouped into three classes:
 \backendname{neo4j} backends invoke the production retrieval-augmented
 agent: a LangGraph ReAct state machine in which a chat model performs
 reasoning while a separate query model generates TypeQL or Cypher
-queries against a live database. The \backendname{context} backend uses
-production's chunked retrieval over a preprocessed regulation
-document. \backendname{closed\_book} is the chat model with no
-retrieval — a baseline for measuring pre-training leakage.
+queries against a live database. The \backendname{context} backend
+uses production's chunked retrieval over a preprocessed regulation
+document. We refer to this same backend as \backendname{C-MD} in the
+surface-form Pareto comparison (Table~\ref{tab:token-cost} and
+Figure~\ref{fig:pareto}), where it is the chunked-retrieval baseline
+against the four full-dump in-context tiers. \backendname{closed\_book}
+is the chat model with no retrieval — a baseline for measuring
+pre-training leakage.
 
 \paragraph{In-context surface-form ablation.} The remaining four
 backends — \backendname{C-TQL}, \backendname{C-Cypher},
