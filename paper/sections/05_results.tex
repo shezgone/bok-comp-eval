@@ -29,13 +29,24 @@ in-context tiers should struggle most.
 To test the gap rigorously we run paired McNemar exact two-sided
 binomial tests on discordant pairs (Table~\ref{tab:mcnemar}). Of eight
 KG-vs-context comparisons, five are statistically significant at
-$p<0.05$, two are borderline ($p=0.052$), and only one (Qwen-235B
-\backendname{typedb} vs \backendname{context}) fails to reject the
-null. The win counts in the discordant column tell the story: in
-HCX the KG agents win at most 5 questions while the context agent
-wins 26.
+$p<0.05$ uncorrected, two are borderline ($p=0.052$), and only one
+(Qwen-235B \backendname{typedb} vs \backendname{context}) fails to
+reject the null. The win counts in the discordant column tell the
+story: in HCX the KG agents win at most 5 questions while the context
+agent wins 26.
 
 \input{tables/mcnemar}
+
+\paragraph{Multiple-testing correction.}
+The picture is consistent under family-wise control. Bonferroni
+correction at $\alpha/8 = 0.00625$ leaves three comparisons significant
+(HCX \backendname{typedb}, HCX \backendname{neo4j}, Llama-4
+\backendname{typedb}). Holm--Bonferroni concurs. Benjamini--Hochberg
+FDR control at $\alpha=0.05$ yields six significant comparisons,
+additionally Qwen \backendname{neo4j} and Llama-4 \backendname{neo4j}.
+The headline finding — production KG agents under-performing
+in-context tiers — survives the most conservative family-wise
+correction in three of four LLM families.
 
 \subsection{The query-generation stage is the bottleneck, not KG expressivity}
 
