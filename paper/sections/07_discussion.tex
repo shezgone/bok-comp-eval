@@ -1,16 +1,49 @@
 \section{Discussion}\label{sec:discussion}
 
+\subsection{Reframing: From Structure Transfer to Relevance Bundling}
+
+The most useful reframe our data supports is one of \emph{purpose}.
+The conventional motivation for a KG in front of an LLM treats the
+KG as a \emph{structure-transfer} layer: faithfully convey N-ary
+facts and schema constraints so the LLM reasons over an isomorphic
+view of the world. Our surface-form ablation shows this purpose is
+inert at the LLM interface: TQL, Cypher, JSON-LD, and NL all reach
+$\geq 83\%$ on positive queries, and NL wins outright on token cost
+and boundary inference. Structure does not transfer because the LLM
+does not need it transferred.
+
+A different purpose is supported strongly: \emph{relevance
+bundling}. The reason the in-context full-graph dumps beat the
+production agent so decisively is that the dump ships the entire
+relevance neighborhood at once, while the agent's query selects a
+narrow slice and discards the rest. The KG's deepest value to the
+pipeline is not its surface form but its \emph{graph topology}: the
+knowledge of which facts co-participate in a query's relevance
+neighborhood, which entities are reachable from which by which
+relations, and (for closed-world inference) which combinations are
+absent from the neighborhood. The LLM does the rest of the work
+once it has the bundle.
+
+This reframe places our result in conversation with
+GraphRAG~\citep{edge2024graphrag} and
+HippoRAG~\citep{gutierrez2024hipporag}, which already operate by
+bundling — community summaries in GraphRAG, PageRank-weighted
+neighborhoods in HippoRAG. Both deliver the bundled neighborhood to
+the LLM as natural-language summary, not as a structured payload.
+Our finding refines and reinforces that direction: the bundle is
+the load-bearing contribution; the structure of the bundle is not.
+
 \subsection{KG Infrastructure as Operational Backbone, Not LLM Interface}
 
-Our results suggest a reframing of KG infrastructure value in the
-LLM era. The conventional motivation for deploying a hyper-relational
-KG in front of an LLM is the expressivity argument: the KG can
-faithfully represent N-ary facts and structural constraints that
-binary triples or natural language cannot. Our data shows that this
-expressivity argument does not transfer to the LLM-facing
-interface — given the same facts in-context, all surface forms
-including natural language reach $\geq 83\%$ accuracy, with NL the
-Pareto winner on accuracy and token cost simultaneously.
+The reframe above re-positions KG infrastructure for the LLM era.
+The conventional motivation for deploying a hyper-relational KG in
+front of an LLM is the expressivity argument: the KG can faithfully
+represent N-ary facts and structural constraints that binary triples
+or natural language cannot. Our data shows that this expressivity
+argument does not transfer to the LLM-facing interface — given the
+same facts in-context, all surface forms including natural language
+reach $\geq 83\%$ accuracy, with NL the Pareto winner on accuracy
+and token cost simultaneously.
 
 The value of KG infrastructure therefore lies elsewhere. We identify
 four operational dimensions in which KGs remain critical:
@@ -41,6 +74,15 @@ four operational dimensions in which KGs remain critical:
       by KG expressivity, not by surface form. The current 30-point
       gap may be closeable from the agent side, not the
       surface-form side.
+\item \textbf{Graph topology as relevance graph.} The KG encodes
+      which facts co-participate in a query's relevance
+      neighborhood. This is what enables relevance bundling and
+      what NL summaries (Recommendation~1) cannot replicate without
+      access to the underlying topology. The LLM interface consumes
+      bundles; the KG produces them. Treating the KG as a
+      relevance-graph producer rather than a structure-transfer
+      layer aligns the system architecture with how the LLM
+      actually uses the data.
 \end{enumerate}
 
 \subsection{Practical Recommendations for KG-LLM Pipelines}
