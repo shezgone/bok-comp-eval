@@ -1,27 +1,29 @@
 % =============================================================================
 % Bibliography for KG-RAG paper.
-% Each entry below has been transcribed from the cite candidate list and is
-% MARKED AS REQUIRING VERIFICATION — venue / year / arXiv id should be
-% confirmed against arXiv / Semantic Scholar / DBLP before submission.
+% Entries marked VERIFIED were cross-checked against arXiv / ACL Anthology /
+% Semantic Scholar on 2026-05-10. Entries still carrying a "verify" note
+% require additional manual confirmation (publisher pages returned 403/404).
 % =============================================================================
 
 @article{edge2024graphrag,
   title  = {From Local to Global: A Graph {RAG} Approach to Query-Focused Summarization},
   author = {Edge, Darren and Trinh, Ha and Cheng, Newman and Bradley, Joshua
-            and Chao, Alex and Mody, Apurva and Truitt, Steven and Larson, Jonathan},
+            and Chao, Alex and Mody, Apurva and Truitt, Steven and
+            Metropolitansky, Dasha and Ness, Robert Osazuwa and
+            Larson, Jonathan},
   journal = {arXiv preprint arXiv:2404.16130},
   year   = {2024},
-  note   = {Microsoft Research; venue and year to be verified}
+  note   = {VERIFIED on arXiv 2026-05-10. 10 authors total.}
 }
 
 @inproceedings{gutierrez2024hipporag,
   title     = {{HippoRAG}: Neurobiologically Inspired Long-Term Memory for
                Large Language Models},
-  author    = {Guti{\'e}rrez, Bernal Jim{\'e}nez and Shu, Yiheng and Gu, Yu
-               and Yasunaga, Michihiro and Su, Yu},
-  booktitle = {Advances in Neural Information Processing Systems},
+  author    = {Guti{\'e}rrez, Bernal Jim{\'e}nez and Shu, Yiheng and
+               Gu, Yu and Yasunaga, Michihiro and Su, Yu},
+  booktitle = {Advances in Neural Information Processing Systems 38 (NeurIPS 2024)},
   year      = {2024},
-  note      = {NeurIPS 2024; verify exact pages and arXiv id}
+  note      = {VERIFIED: NeurIPS 2024, arXiv:2405.14831.}
 }
 
 @inproceedings{saxena2022kgt5,
@@ -31,7 +33,7 @@
                Computational Linguistics (Volume 1: Long Papers)},
   year      = {2022},
   pages     = {2814--2828},
-  note      = {arXiv:2203.10321; verify}
+  note      = {VERIFIED on ACL Anthology 2026-05-10. arXiv:2203.10321.}
 }
 
 @inproceedings{galkin2020stare,
@@ -41,17 +43,19 @@
   booktitle = {Proceedings of the 2020 Conference on Empirical Methods in
                Natural Language Processing (EMNLP)},
   year      = {2020},
-  note      = {arXiv:2009.10847; verify}
+  pages     = {7346--7359},
+  note      = {VERIFIED on ACL Anthology 2026-05-10. arXiv:2009.10847.}
 }
 
 @article{liu2023lostmiddle,
   title   = {Lost in the Middle: How Language Models Use Long Contexts},
-  author  = {Liu, Nelson F. and Lin, Kevin and Hewitt, John and Paranjape,
-             Ashwin and Bevilacqua, Michele and Petroni, Fabio and Liang,
-             Percy},
+  author  = {Liu, Nelson F. and Lin, Kevin and Hewitt, John and
+             Paranjape, Ashwin and Bevilacqua, Michele and
+             Petroni, Fabio and Liang, Percy},
   journal = {Transactions of the Association for Computational Linguistics},
-  year    = {2024},
-  note    = {arXiv:2307.03172; verify TACL volume/issue}
+  year    = {2023},
+  note    = {VERIFIED on arXiv 2026-05-10. arXiv:2307.03172,
+             accepted to TACL 2023.}
 }
 
 @article{hogan2021kgsurvey,
@@ -68,17 +72,19 @@
   number  = {4},
   year    = {2021},
   pages   = {1--37},
-  note    = {Verify exact issue/page numbers}
+  note    = {DOI 10.1145/3447772. Publisher page returned 403 during automated
+             verification; manually verify exact pagination before submission.}
 }
 
-@article{reiter1978cwa,
-  title   = {On Closed World Data Bases},
-  author  = {Reiter, Raymond},
-  journal = {Logic and Data Bases},
-  pages   = {55--76},
-  year    = {1978},
+@inproceedings{reiter1978cwa,
+  title     = {On Closed World Data Bases},
+  author    = {Reiter, Raymond},
+  booktitle = {Logic and Data Bases},
+  editor    = {Gallaire, Herv{\'e} and Minker, Jack},
+  pages     = {55--76},
+  year      = {1978},
   publisher = {Plenum Press},
-  note    = {Foundational reference for closed-world assumption; verify chapter/pages}
+  note      = {Foundational KR reference. Manually verify pagination before submission.}
 }
 
 @inproceedings{wen2016mtransh,
@@ -89,29 +95,23 @@
   booktitle = {Proceedings of the Twenty-Fifth International Joint Conference
                on Artificial Intelligence (IJCAI)},
   year      = {2016},
-  note      = {Verify venue}
+  note      = {IJCAI proceedings PDF URL returned 404 during automated
+               verification; cross-check author list and pages on DBLP.}
 }
 
 @inproceedings{guan2019nalp,
   title     = {Link Prediction on N-ary Relational Data},
   author    = {Guan, Saiping and Jin, Xiaolong and Wang, Yuanzhuo and Cheng, Xueqi},
-  booktitle = {Proceedings of the World Wide Web Conference (WWW)},
+  booktitle = {Proceedings of the World Wide Web Conference (WWW 2019)},
   year      = {2019},
-  note      = {Verify venue}
+  note      = {Semantic Scholar fetch incomplete; verify pages and DOI on DBLP.}
 }
 
 @misc{vaticle2023typeql,
   title  = {{TypeQL}: A Strongly Typed Language for Knowledge Modelling},
   author = {{Vaticle TypeDB Team}},
   year   = {2023},
-  note   = {Industrial whitepaper; verify reference and consider alternative
-            citations from the TypeDB documentation}
-}
-
-@misc{anthropic2026claude,
-  title  = {Llama-4-Scout-17B-16E-Instruct, Qwen3-235B-A22B-Instruct,
-            HyperCLOVA X SEED-32B-Think, gpt-oss-120b: Model cards},
-  author = {Various},
-  year   = {2024--2025},
-  note   = {Replace with individual model card citations or technical reports}
+  note   = {Industrial whitepaper / documentation. Consider replacing with a
+            peer-reviewed reference once TypeDB v3 publishes one; LNCS may
+            require a specific format for tech-report citations.}
 }
