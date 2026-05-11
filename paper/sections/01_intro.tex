@@ -13,11 +13,22 @@ player structure faithfully, and a ReAct-style agent can in principle
 exploit that structure via formal queries (TypeQL, Cypher) for
 multi-hop reasoning.
 
+\paragraph{Scope.} Our setting is a regulatory KG-RAG deployment in
+which the entire structured fact base fits within a modern LLM's
+32K-token context window. We argue this scope is unusually broad in
+practice: regulations, organizational policies, clinical guidelines,
+benefits schedules, and many similar enterprise corpora have fact
+bases of low single-digit megabytes once serialized, well below
+state-of-the-art context limits. The claims in this paper are
+explicitly scoped to such fact-bounded domains; multi-million-fact
+KGs (knowledge bases of the open Web, biomedical corpora, etc.)
+require retrieval and are out of scope for the surface-form ablation.
+
 This paper reports a counterintuitive finding from a production
-deployment of exactly such a system. Over the Bank of Korea
-Compensation Regulations — a 200-page Korean public-sector document
-with eight N-ary fact tables and twelve supplementary clauses — we
-evaluate four LLM families against eight backends (TypeDB
+deployment of exactly such a fact-bounded system. Over the Bank of
+Korea Compensation Regulations — a 200-page Korean public-sector
+document with eight N-ary fact tables and twelve supplementary
+clauses — we evaluate four LLM families against eight backends (TypeDB
 hyper-relational agent, Neo4j property-graph agent, production
 chunked-context retriever, closed-book LLM, and four
 \emph{in-context surface-form} variants in which the entire KG is

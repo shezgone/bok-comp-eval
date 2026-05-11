@@ -83,6 +83,25 @@ counts, filters, multi-hop traversals beyond the summary template).
 This inverts the common architecture in which the KG agent is
 \emph{primary} and a context document is the fall-back.
 
+\subsection{Scope: Fact-Bounded KGs in the 32K-Token Regime}
+
+A natural objection is that our findings apply only when the entire
+KG fits in the LLM context, and thus cannot generalize to KGs serving
+Web-scale or multi-million-fact use cases. We accept this scope but
+argue the relevant population is larger than it first appears.
+Regulations, internal policies, benefits schedules, clinical
+guidelines, organizational handbooks, compliance frameworks, and many
+enterprise knowledge bases serialize to a few megabytes of structured
+facts — well inside the 32K--200K token windows of current LLMs. For
+\emph{this} substantial class of domains, our results are directly
+applicable: production teams currently invest in KG-agent
+infrastructure where the cheaper, more accurate path is an in-context
+NL summary. The argument for KG infrastructure shifts from "in-context
+limits" (where it does not hold for fact-bounded KGs) to the four
+operational dimensions in \S7.1. For Web-scale or open-domain KGs, the
+retrieval problem is different and our findings do not extend; we
+treat this as an explicit boundary.
+
 \subsection{Relation to Counterintuitive H1}
 
 The pre-experiment hypothesis — "even a maximally preprocessed

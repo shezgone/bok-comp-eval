@@ -89,6 +89,21 @@ falls to 63\% on the same surface form, dragging down the C-TQL
 mean. C-NL is the only surface form that maintains $\geq 83\%$
 accuracy across all four LLMs.
 
+\subsection{On Setting A vs.\ Setting B}
+
+A 30-question pilot under \emph{Setting A} — same LLM as chat and
+query agent — produced LLM-family-asymmetric KG results: Qwen3-235B
+on \backendname{neo4j} jumped +23\,pp from Setting A to Setting B,
+while \backendname{typedb} dropped --6\,pp. The asymmetry confirms
+that single-LLM measurements conflate KG-backend effects with the
+LLM's TypeQL/Cypher syntax familiarity, which is precisely the
+mechanism Section~\ref{sec:mechanism} dissects. We therefore use
+Setting B (query agent fixed at Qwen3-Coder-30B) as the
+production-realistic configuration throughout this paper. Full
+Setting A figures appear in Appendix~\ref{sec:appendix}; we report
+them transparently rather than as a contrast that flatters the
+main result.
+
 \subsection{Multi-key categories: the regime KG agents are designed for}
 
 Restricting to the H1-relevant categories — \texttt{calculation},

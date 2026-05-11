@@ -17,17 +17,33 @@ boundary-inference finding (Section~6.2) is qualitative. Scaling
 to 1{,}000+ questions, with explicit balance toward boundary and
 multi-key categories, is the highest-priority follow-on.
 
-\paragraph{Production-agent specifics.}
+\paragraph{Production-agent specifics, and the GraphRAG / HippoRAG
+absence.}
 The KG-agent results are tied to one specific production
 implementation (LangGraph ReAct with three-attempt retries). A
 different agent — for example, a graph-aware retrieval-then-rerank
 pipeline like GraphRAG \citep{edge2024graphrag} or a
 PageRank-driven retriever like HippoRAG
 \citep{gutierrez2024hipporag} — could close some of the
-30-percentage-point gap. We do not include such external baselines
-in the present paper; doing so is a critical next step before
-generalizing the "query-generation bottleneck" claim beyond
-ReAct-style agents.
+30-percentage-point gap.
+
+We explicitly do not include those external baselines in the present
+paper for two reasons. First, both GraphRAG and HippoRAG build the KG
+\emph{from} a text corpus and operate by community-summary or
+PageRank-style retrieval — neither directly evaluates a curated
+hyper-relational production KG of the kind we study. Re-tooling them
+for our setting (TypeDB v3 schema, N-ary roleplayers, Korean prose
+articles) requires non-trivial adaptation that we judged outside the
+scope of a first-of-kind production case study. Second, our central
+claim is about \emph{surface form} (Section~\ref{sec:results}), not
+about retrieval mechanism, and the surface-form comparison is
+internally controlled regardless of the choice of upstream retriever.
+We treat external-baseline integration as the highest-priority
+follow-on: a single 100-question evaluation of GraphRAG on the same
+Korean regulation corpus would either confirm the surface-form
+finding (NL summary remains Pareto-optimal even against community
+summaries) or expose a regime in which structured retrieval recovers
+the gap.
 
 \paragraph{Surface forms covered.}
 We test four surface forms (TQL, Cypher, NL, JSON-LD). Other
