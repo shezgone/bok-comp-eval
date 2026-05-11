@@ -36,25 +36,82 @@ collapse (\texttt{comparison} 38\%, \texttt{multihop\_3key} 47\%,
 Lookup of one fact survives an unfamiliar syntax; \emph{traversing}
 multiple facts under that syntax does not.
 
-\subsection{In-Context KG Underperforms NL on Boundary Inference}
+\subsection{Surface Form and Closed-World Boundary Inference}
 
 The previous section's mechanism is about \emph{positive}
 queries — where the answer exists in the data. A symmetric question
 is whether the surface form matters for \emph{negative} queries,
-where the correct answer is "no such fact exists." We isolate the
-six \texttt{out\_of\_scope} questions: each asks for a
-(position, grade), (country, grade), or (allowance) combination
-that is provably absent from the regulation tables. For all six
-questions the in-context dumps contain enough information to derive
-the absence (the position-pay table lists all valid combinations,
-the overseas-pay table lists all six countries, and the article-text
-prefix defines the closed set of allowances).
+where the correct answer is "no such fact exists." We extend the
+\texttt{out\_of\_scope} category from 6 to 30 questions (124-question
+extended evaluation set, \texttt{eval/full\_questions\_v2.jsonl}),
+covering (position, grade) combinations absent from the position-pay
+table, countries absent from the overseas-pay table, allowance types
+outside the article-2 closed set, salary-step / job-grade /
+evaluation-tier values outside their defined ranges, and wage-peak
+years beyond the schedule. For each question the in-context dumps
+contain enough information to derive the absence.
 
 \input{figures/boundary_oos}
 
-Despite full data coverage, the formal KG dumps under-perform
-natural language on this category. We attribute this to three
-compounding factors:
+\paragraph{Mean accuracy across four LLMs (n=30 per cell).}
+On this extended set, the per-LLM means by surface form become:
+\begin{center}
+\begin{tabular}{l rrrr | r}
+\toprule
+Backend & HCX & Qwen & Llama-4 & gpt-oss & Mean \\
+\midrule
+\backendname{typedb}        & 66.7 & 86.7 & 40.0 & 70.0 & 65.8 \\
+\backendname{neo4j}         & 60.0 & 90.0 & 43.3 & 73.3 & 66.7 \\
+\backendname{context}       & 17.2 & 37.9 &  3.3 &  3.3 & 15.4 \\
+\backendname{closed\_book}  & 100.0 & 40.0 & 16.7 & 66.7 & 55.8 \\
+\backendname{C-TQL}         & 75.9 & 90.0 & 90.0 & 100.0 & 89.0 \\
+\backendname{C-Cypher}      & 72.4 & 96.7 & 80.0 & 96.6 & 86.4 \\
+\backendname{C-NL}          & 90.0 & 93.3 & 90.0 & 96.7 & 92.5 \\
+\backendname{C-JSONLD}      & 79.3 & 86.7 & 96.7 & 90.0 & 88.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Three patterns stand out. (1) \textbf{Natural-language summary
+(C-NL) leads with a four-LLM mean of 92.5\%} — the most consistent
+performer across all LLM families. (2) \textbf{Production chunked
+retrieval (\backendname{context}) collapses to 15.4\%}: chunked
+retrieval is uniquely bad at proving non-existence because retrieval
+returns whatever does match, leaving no signal about what is absent
+from the index. (3) \textbf{Closed-book HCX hits 100\%}: a default-
+refusal behavior masquerades as accuracy on this category, a
+metric artifact we address below.
+
+\paragraph{Closed-book accuracy artifact.}
+HCX-32B-Think defaults to "명시되지 않음" (not specified) when it
+lacks domain knowledge. On \texttt{out\_of\_scope} questions whose
+gold answer is also a refusal, this default produces $30/30 = 100\%$
+without any actual reasoning about regulation boundaries. The other
+three LLMs hallucinate plausible numbers more often
+(closed-book \texttt{out\_of\_scope}: Qwen 40\%, Llama-4 17\%,
+gpt-oss 67\%). The accuracy metric alone cannot distinguish
+\emph{principled} refusal (the model checked the data and concluded
+absence) from \emph{default} refusal (the model refuses everything
+it is unsure of). For the in-context tiers and KG agents, accuracy
+on this category is a meaningful boundary-inference signal because
+the same models do not default to refusal in other categories; for
+\backendname{closed\_book}, accuracy on this category is uninformative
+and should be reported separately from accuracy on positive
+categories. We discuss this caveat in
+Section~\ref{sec:limits}.
+
+\paragraph{Why in-context KG still beats production retrieval.}
+The dominant pattern across LLMs — \backendname{C-NL} 92.5\% vs.\
+\backendname{context} 15.4\% — confirms our core thesis sharpened on
+the boundary task: serializing the full graph (in any of the four
+surface forms) gives the LLM the closed-world context that chunked
+retrieval erases. The retrieval system, optimized to surface
+\emph{relevant} chunks, has no mechanism to surface what is
+\emph{absent}. The bundled in-context dump trivially does.
+
+Even within the in-context tiers, three subtle effects remain
+(amplified at the 6-question pilot but partially attenuated at
+n=30):
 
 \begin{enumerate}
 \item \textbf{Cognitive load.} A positive lookup requires one
