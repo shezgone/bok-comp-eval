@@ -143,5 +143,33 @@ A 16-percentage-point gap to C-NL (83\%) remains even with the
 guide. Syntax familiarity is necessary but not sufficient for closing
 the surface-form gap; some additional load — possibly the
 cross-reference cognitive cost of formal-syntax reading — persists
-beyond what a brief primer can fix. We treat the full guide ablation
-(four LLMs $\times$ three structured tiers) as future work.
+beyond what a brief primer can fix.
+
+\paragraph{Guide effectiveness depends on baseline familiarity.}
+To probe the limits of the syntax-guide remedy, we repeat the
+ablation on C-TQL — the same Llama-4-Scout, the same primer
+methodology, a 531-character TypeQL primer explaining N-ary
+role-player notation. The result inverts: C-TQL drops from 63\% to
+55.8\% (a 7.2-percentage-point regression), with the largest
+per-category losses on \texttt{calculation} (--30.2~pp) and
+\texttt{join\_2key} (--20.0~pp). Strikingly, the same primer lifts
+\texttt{out\_of\_scope} accuracy from 67\% to 100\% (+33.3~pp): the
+explicit description of role-player roles seems to prompt the model
+to reason about \emph{which} roles are present and absent, but at
+the cost of confusing single-fact lookup that was previously working
+on syntactic-pattern matching alone.
+
+We read this as evidence that guide remedies are conditional on
+baseline syntactic familiarity. Cypher's \texttt{CREATE
+(a)-[:R]->(b)} pattern is sufficiently represented in the LLM's
+pre-training that a brief primer activates correctly. TypeQL's
+N-ary role-player syntax is sufficiently rare that the primer
+introduces \emph{new} cognitive load (parsing the guide itself,
+re-interpreting prior partial patterns) rather than reinforcing an
+existing capability. The implication is that low-familiarity formal
+languages may not be repairable from the prompt side at all;
+specialized fine-tuning or query-language-aware coder models
+(Section~\ref{sec:discussion}, Recommendation~3) are the more
+plausible remedy. We treat full coverage of this ablation (four
+LLMs $\times$ three structured tiers $\times$ ±guide) as future
+work.
